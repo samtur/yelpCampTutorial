@@ -1,3 +1,4 @@
+// REQUIRMENTS AND CONNECTIONS
 // Here we are requiring express and path.
 const express = require('express');
 const path = require('path');
@@ -12,8 +13,8 @@ const expressError = require('./utils/expressError')
 // Require model.
 const methodOverride = require('method-override');
 const Campground = require('./models/campgrounds');
+const Review = require('./models/review')
 // Require method override.
-
 // Our middleware to call Joi validations.
 const validateCampground = (req, res, next) => {
 
@@ -27,11 +28,8 @@ const validateCampground = (req, res, next) => {
         next()
     }
 }
-
 // Require mongoose and connect.
-
 mongoose.connect('mongodb://localhost:27017/yelp-camp');
-
 // Logic to check for errors on db connection.
 // db variable shortens syntax.
 const db = mongoose.connection;
@@ -39,7 +37,6 @@ db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', () => {
     console.log('database connected!')
 });
-
 // Calling express.
 const app = express();
 // Using ejs-mate
@@ -47,13 +44,14 @@ app.engine('ejs', ejsMate)
 // Here we are linking to our views ejs templates.
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'))
-
 // Here we are allowing our req.body to be parsed so
 // we can display it.
 app.use(express.urlencoded({ extended: true }))
 // We need to use method override.
 app.use(methodOverride('_method'))
 
+
+// SITE ROUTES
 // Here we are creating a basic route to test.
 // We render our home to test our home.ejs
 app.get('/', (req, res) => {
@@ -129,6 +127,16 @@ app.delete('/campgrounds/:id', wrapAsync(async (req, res) => {
     const { id } = req.params;
     await Campground.findByIdAndDelete(id);
     res.redirect('/campgrounds');
+}))
+
+// Review post route.
+app.post('/campgrounds/:id/reviews', wrapAsync(async (req, res) => {
+    const campground = await Campground.findById(req.params.id);
+    const review = new Review(req.body.review);
+    campground.reviews.push(review);
+    await review.save();
+    await campground.save();
+    res.redirect(`/campgrounds/${campground._id}`);
 }))
 
 // app.all covers all requests '*' = every path.
