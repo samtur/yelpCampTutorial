@@ -6,7 +6,7 @@ const mongoose = require('mongoose');
 // Requiring ejs-mate
 const ejsMate = require('ejs-mate');
 // Require joi schema in app.
-const { campgroundSchema } = require('./schemas.js')
+const { campgroundSchema, reviewSchema } = require('./schemas.js')
 // Requiring function from other file.
 const wrapAsync = require('./utils/wrapAsync');
 const expressError = require('./utils/expressError')
@@ -17,7 +17,6 @@ const Review = require('./models/review')
 // Require method override.
 // Our middleware to call Joi validations.
 const validateCampground = (req, res, next) => {
-
     const { error } = campgroundSchema.validate(req.body);
     // This is saying if there is an error throw an error to our error handler.
     if (error) {
@@ -28,6 +27,17 @@ const validateCampground = (req, res, next) => {
         next()
     }
 }
+// Joi middleware for review validations:
+const validateReview = (req, res, next) => {
+    const { error } = reviewSchema.validate(req.body);
+    if (error) {
+        const msg = error.details.map(el => el.message).join(',');
+        throw new expressError(msg, 400)
+    } else {
+        next()
+    }
+}
+
 // Require mongoose and connect.
 mongoose.connect('mongodb://localhost:27017/yelp-camp');
 // Logic to check for errors on db connection.
@@ -94,7 +104,7 @@ app.post('/campgrounds', validateCampground, wrapAsync(async (req, res, next) =>
 // We can find our campground by id and save as campground.
 // This is then pass through so we can access in our templates.
 app.get('/campgrounds/:id', wrapAsync(async (req, res, next) => {
-    const campground = await Campground.findById(req.params.id);
+    const campground = await Campground.findById(req.params.id).populate('reviews');
     res.render('campgrounds/show', { campground });
 }))
 
@@ -130,13 +140,21 @@ app.delete('/campgrounds/:id', wrapAsync(async (req, res) => {
 }))
 
 // Review post route.
-app.post('/campgrounds/:id/reviews', wrapAsync(async (req, res) => {
+app.post('/campgrounds/:id/reviews', validateReview, wrapAsync(async (req, res) => {
     const campground = await Campground.findById(req.params.id);
     const review = new Review(req.body.review);
     campground.reviews.push(review);
     await review.save();
     await campground.save();
     res.redirect(`/campgrounds/${campground._id}`);
+}))
+
+// Review delete route.
+app.delete('/campgrounds/:id/reviews/:reviewId', wrapAsync(async (req, res) => {
+    const { id, reviewId } = req.params;
+    await Campground.findByIdAndUpdate(id, { $pull: { reviews: reviewId } })
+    await Review.findByIdAndDelete(reviewId);
+    res.redirect(`/campgrounds/${id}`);
 }))
 
 // app.all covers all requests '*' = every path.
