@@ -5,29 +5,13 @@ const path = require('path');
 const mongoose = require('mongoose');
 // Requiring ejs-mate
 const ejsMate = require('ejs-mate');
-// Require joi schema in app.
-const { campgroundSchema, reviewSchema } = require('./schemas.js')
 // Requiring function from other file.
-const wrapAsync = require('./utils/wrapAsync');
 const expressError = require('./utils/expressError')
 // Require model.
 const methodOverride = require('method-override');
-const Campground = require('./models/campgrounds');
-const Review = require('./models/review')
 
 const campgrounds = require('./routes/campgrounds')
-
-
-// Joi middleware for review validations:
-const validateReview = (req, res, next) => {
-    const { error } = reviewSchema.validate(req.body);
-    if (error) {
-        const msg = error.details.map(el => el.message).join(',');
-        throw new expressError(msg, 400)
-    } else {
-        next()
-    }
-}
+const reviews = require('./routes/reviews')
 
 // Require mongoose and connect.
 mongoose.connect('mongodb://localhost:27017/yelp-camp');
@@ -52,6 +36,7 @@ app.use(express.urlencoded({ extended: true }))
 app.use(methodOverride('_method'))
 
 app.use('/campgrounds', campgrounds)
+app.use('/campgrounds/:id/reviews', reviews)
 
 
 // SITE ROUTES
@@ -61,25 +46,6 @@ app.get('/', (req, res) => {
     res.render('home');
 })
 
-
-
-// Review post route.
-app.post('/campgrounds/:id/reviews', validateReview, wrapAsync(async (req, res) => {
-    const campground = await Campground.findById(req.params.id);
-    const review = new Review(req.body.review);
-    campground.reviews.push(review);
-    await review.save();
-    await campground.save();
-    res.redirect(`/campgrounds/${campground._id}`);
-}))
-
-// Review delete route.
-app.delete('/campgrounds/:id/reviews/:reviewId', wrapAsync(async (req, res) => {
-    const { id, reviewId } = req.params;
-    await Campground.findByIdAndUpdate(id, { $pull: { reviews: reviewId } })
-    await Review.findByIdAndDelete(reviewId);
-    res.redirect(`/campgrounds/${id}`);
-}))
 
 // app.all covers all requests '*' = every path.
 // The covers errors for wrong urls
