@@ -20,7 +20,8 @@ This acts as a master layout that we can apply styles to -->
     <%- include('../partials/navbar') %>
         <!-- Bootstrap container -->
         <main class="container mt-5">
-            <%- body %>
+            <%- include('../partials/flash') %>
+                <%- body %>
         </main>
         <!-- Poppers for JS -->
         <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.5/dist/umd/popper.min.js"
@@ -31,26 +32,8 @@ This acts as a master layout that we can apply styles to -->
             crossorigin="anonymous"></script>
         <!-- Including partial footer -->
         <%- include('../partials/footer') %>
-            <!-- JS for enabling requirements on forms using bootstrap -->
-            <script>
-                // Example starter JavaScript for disabling form submissions if there are invalid fields
-                (function () {
-                    'use strict'
-                    // Fetch all the forms we want to apply custom Bootstrap validation styles to
-                    const forms = document.querySelectorAll('.validatedForm')
-                    // Loop over them and prevent submission
-                    Array.prototype.slice.call(forms)
-                        .forEach(function (form) {
-                            form.addEventListener('submit', function (event) {
-                                if (!form.checkValidity()) {
-                                    event.preventDefault()
-                                    event.stopPropagation()
-                                }
-                                form.classList.add('was-validated')
-                            }, false)
-                        })
-                })()
-            </script>
+
+            <script src="/javascript/validateforms.js"></script>
 </body>
 
 </html>
