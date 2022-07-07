@@ -14,8 +14,11 @@ router.post('/register', wrapAsync(async (req, res) => {
         const { email, username, password } = req.body;
         const user = new User({ email, username });
         const registeredUser = await User.register(user, password);
-        req.flash('success', 'Welcome to Yelp Camp');
-        res.redirect('/campgrounds');
+        req.login(registeredUser, err => {
+            if (err) return next(err)
+            req.flash('success', 'Welcome to Yelp Camp');
+            res.redirect('/campgrounds');
+        })
     } catch (e) {
         req.flash('error', e.message);
         res.redirect('/register');
@@ -28,15 +31,15 @@ router.get('/login', (req, res) => {
 
 router.post('/login', passport.authenticate('local', { failureFlash: true, failureRedirect: '/login' }), (req, res) => {
     req.flash('success', 'Welcome Back!');
-    res.redirect('/campgrounds')
+    const redirectUrl = req.session.returnTo || '/campgrounds';
+    delete req.session.returnTo;
+    res.redirect('/campgrounds');
 })
 
 router.get('/logout', (req, res, next) => {
-    req.logout(function (err) {
-        if (err) { return next(err); }
-        req.flash('success', 'Successfully Logged Out!');
-        res.redirect('/campgrounds');
-    });
+    req.logout();
+    req.flash('success', 'Successfully Logged Out!');
+    res.redirect('/campgrounds');
 });
 // EXECUTING ROUTER
 module.exports = router;

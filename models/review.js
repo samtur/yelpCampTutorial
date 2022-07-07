@@ -1,11 +1,14 @@
-// Requires
+// REQUIRES
 const mongoose = require('mongoose');
-// Shorten Schema syntax.
 const Schema = mongoose.Schema;
-// review model
+// SCHEMA
 const reviewSchema = new Schema({
     body: String,
-    rating: Number
+    rating: Number,
+    author: {
+        type: Schema.Types.ObjectId,
+        ref: 'User'
+    }
 })
-// export model
+// EXPORTING SCHEMA
 module.exports = mongoose.model("Review", reviewSchema)
