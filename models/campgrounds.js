@@ -1,4 +1,5 @@
 // Require mongoose.
+const { string } = require('joi');
 const mongoose = require('mongoose');
 // Varibable to shorten syntax.
 const Schema = mongoose.Schema;
@@ -7,7 +8,12 @@ const Review = require('./review')
 // Our schema.
 const CampgroundSchema = new Schema({
     title: String,
-    image: String,
+    images: [
+        {
+            url: String,
+            filename: String
+        }
+    ],
     price: Number,
     description: String,
     location: String,
