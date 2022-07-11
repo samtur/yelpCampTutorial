@@ -7,6 +7,7 @@
     A footer was added at the end to link back maybe don't include later-->
     <div class="row">
         <div class="col-6">
+            <div id='map' style='width: 400px; height: 300px;'></div>
             <!-- CAROUSEL -->
             <div id="campgroundCarousel" class="carousel slide" data-bs-ride="carousel">
                 <div class="carousel-inner">
@@ -115,19 +116,4 @@
                         <% } %>
         </div>
     </div>
-
-    <script>
-        const reviewForm = document.querySelector(".reviewForm");
-        const defaultStarInput = document.querySelector("input[name='review[rating]']");
-        const statusContainer = document.querySelector("#status");
-        if (reviewForm) {
-            reviewForm.addEventListener("submit", function (e) {
-                if (defaultStarInput.checked) {
-                    statusContainer.classList.remove("d-none");
-                    e.preventDefault();
-                } else {
-                    statusContainer.classList.add("d-none");
-                }
-            })
-        }
-    </script>
+    <script src="/javascript/showPage.js"></script>
