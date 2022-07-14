@@ -13,6 +13,8 @@ const expressError = require('./utils/expressError');
 const methodOverride = require('method-override');
 const passport = require('passport');
 const LocalStrategy = require('passport-local');
+const mongoSanitize = require('express-mongo-sanitize');
+const helmet = require('helmet');
 
 // MODELS
 const User = require('./models/user');
@@ -38,6 +40,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 // METHOD OVERRIDE EXECUTION
 app.use(methodOverride('_method'));
 
+// MONGO SANTITIZE
+app.use(mongoSanitize());
+
 // EJS EXECUTION
 app.engine('ejs', ejsMate);
 app.set('view engine', 'ejs');
@@ -45,6 +50,7 @@ app.set('views', path.join(__dirname, 'views'));
 
 // SESSION EXECUTION/CONFIG
 const sessionConfig = {
+    name: 'yelpCampSession',
     secret: 'thisisasecret',
     resave: false,
     saveUninitialized: true,
@@ -52,10 +58,58 @@ const sessionConfig = {
         expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
         maxAge: 1000 * 60 * 60 * 24 * 7,
         httpOnly: true,
+        // secure: true
     }
 }
 app.use(session(sessionConfig));
 app.use(flash());
+// app.use(helmet());
+
+
+const scriptSrcUrls = [
+    "https://stackpath.bootstrapcdn.com/",
+    "https://api.tiles.mapbox.com/",
+    "https://api.mapbox.com/",
+    "https://kit.fontawesome.com/",
+    "https://cdnjs.cloudflare.com/",
+    "https://cdn.jsdelivr.net",
+];
+const styleSrcUrls = [
+    "https://kit-free.fontawesome.com/",
+    "https://stackpath.bootstrapcdn.com/",
+    "https://api.mapbox.com/",
+    "https://api.tiles.mapbox.com/",
+    "https://fonts.googleapis.com/",
+    "https://use.fontawesome.com/",
+    "https://cdn.jsdelivr.net",
+];
+const connectSrcUrls = [
+    "https://api.mapbox.com/",
+    "https://a.tiles.mapbox.com/",
+    "https://b.tiles.mapbox.com/",
+    "https://events.mapbox.com/",
+];
+const fontSrcUrls = [];
+app.use(
+    helmet.contentSecurityPolicy({
+        directives: {
+            defaultSrc: [],
+            connectSrc: ["'self'", ...connectSrcUrls],
+            scriptSrc: ["'unsafe-inline'", "'self'", ...scriptSrcUrls],
+            styleSrc: ["'self'", "'unsafe-inline'", ...styleSrcUrls],
+            workerSrc: ["'self'", "blob:"],
+            objectSrc: [],
+            imgSrc: [
+                "'self'",
+                "blob:",
+                "data:",
+                "https://res.cloudinary.com/denecgcsf/", //SHOULD MATCH YOUR CLOUDINARY ACCOUNT! 
+                "https://images.unsplash.com/",
+            ],
+            fontSrc: ["'self'", ...fontSrcUrls],
+        },
+    })
+);
 
 // PASSPORT EXECUTION/CONFIG
 app.use(passport.initialize());

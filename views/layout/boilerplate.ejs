@@ -14,6 +14,7 @@ This acts as a master layout that we can apply styles to -->
 
     <script src='https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.js'></script>
     <link href='https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.css' rel='stylesheet' />
+    <link rel="stylesheet" href="/stylesheets/map.css">
 
 
 </head>
@@ -23,22 +24,22 @@ This acts as a master layout that we can apply styles to -->
 <body class="d-flex flex-column vh-100">
     <!-- Ejs to access our partial for our navbar -->
     <%- include('../partials/navbar') %>
-        <!-- Bootstrap container -->
-        <main class="container mt-5">
-            <%- include('../partials/flash') %>
-                <%- body %>
-        </main>
-        <!-- Poppers for JS -->
-        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.5/dist/umd/popper.min.js"
-            integrity="sha384-Xe+8cL9oJa6tN/veChSP7q+mnSPaj5Bcu9mPX5F5xIGE0DVittaqT5lorf0EI7Vk"
-            crossorigin="anonymous"></script>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.min.js"
-            integrity="sha384-kjU+l4N0Yf4ZOJErLsIcvOU2qSb74wXpOhqTvwVx3OElZRweTnQ6d31fXEoRD1Jy"
-            crossorigin="anonymous"></script>
-        <!-- Including partial footer -->
-        <%- include('../partials/footer') %>
+    <!-- Bootstrap container -->
+    <main class="container mt-5">
+        <%- include('../partials/flash') %>
+        <%- body %>
+    </main>
+    <!-- Poppers for JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.5/dist/umd/popper.min.js"
+        integrity="sha384-Xe+8cL9oJa6tN/veChSP7q+mnSPaj5Bcu9mPX5F5xIGE0DVittaqT5lorf0EI7Vk"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.min.js"
+        integrity="sha384-kjU+l4N0Yf4ZOJErLsIcvOU2qSb74wXpOhqTvwVx3OElZRweTnQ6d31fXEoRD1Jy"
+        crossorigin="anonymous"></script>
+    <!-- Including partial footer -->
+    <%- include('../partials/footer') %>
 
-            <script src="/javascript/validateforms.js"></script>
+    <script src="/javascript/validateforms.js"></script>
 </body>
 
 </html>
