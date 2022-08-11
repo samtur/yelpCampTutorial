@@ -1,5 +1,5 @@
 # yelpCampTutorial
-YelpCamp Tutorial
+YelpCamp Project
 
 A node.js campground review website created by following along with Colt Steele's "Web Developer Bootcamp 2022" 
 course on Udemy.com 
